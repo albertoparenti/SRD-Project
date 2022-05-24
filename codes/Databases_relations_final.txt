@@ -1,0 +1,233 @@
+CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
+USE `mydb` ;
+
+-- -----------------------------------------------------
+-- Table `city`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `city` (
+  `id_city` INT NOT NULL,
+  `city_name` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_city`)
+);
+
+-- -----------------------------------------------------
+-- Table `driver_status`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `driver_status` (
+  `id_status` INT NOT NULL,
+  `status` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_status`)
+ );
+
+
+-- -----------------------------------------------------
+-- Table `order_status`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `order_status` (
+  `id_order_status` INT NOT NULL,
+  `order_status` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_order_status`),
+  INDEX `Status_UNIQUE` (`order_status` ASC) VISIBLE);
+
+
+-- -----------------------------------------------------
+-- Table `location`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `location` (
+  `id_location` INT NOT NULL,
+  `street_address` VARCHAR(250) NOT NULL,
+  `number` VARCHAR(45) NOT NULL,
+  `id_city` INT NOT NULL,
+  `longitude` FLOAT NOT NULL,
+  `latitude` FLOAT NOT NULL,
+  `zip_code` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_location`),
+  INDEX `location_UNIQUE` (`street_address`,`zip_code`,`longitude`,`latitude` ASC) VISIBLE,
+  CONSTRAINT `fk_location_city1`
+    FOREIGN KEY (`id_city`)
+    REFERENCES `city` (`id_city`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+
+
+-- -----------------------------------------------------
+-- Table `customers_status`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `customers_status` (
+  `id_customers_status` INT NOT NULL,
+  `customers_status` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_customers_status`),
+  INDEX `customers_status_id_UNIQUE` (`customers_status` ASC) VISIBLE
+ );
+
+-- -----------------------------------------------------
+-- Table `people`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `people` (
+  `id_person` INT NOT NULL,
+  `first_name` VARCHAR(45) NULL,
+  `last_name` VARCHAR(45) NULL,
+  `date_of_birth` DATE  NULL,
+  `date_registration` DATE ,
+  PRIMARY KEY (`id_person`),
+  INDEX `people_UNIQUE` (`first_name`,`last_name`,`date_registration` ASC) VISIBLE	
+);
+
+
+-- -----------------------------------------------------
+-- Table `customers`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `customers` (
+  `id_customer` INT NOT NULL,
+  `id_person` INT NOT NULL,
+  `id_location` INT NOT NULL,
+  `id_customers_status` INT NOT NULL,
+  PRIMARY KEY (`id_customer`),
+    CONSTRAINT `fk_customers_location1`
+    FOREIGN KEY (`id_location`)
+    REFERENCES `location` (`id_location`)
+    ON DELETE  RESTRICT
+    ON UPDATE  CASCADE,
+  CONSTRAINT `fk_customers_people1`
+    FOREIGN KEY (`id_person`)
+    REFERENCES `people` (`id_person`)
+    ON DELETE  RESTRICT
+    ON UPDATE  CASCADE,
+  CONSTRAINT `fk_customers_status1`
+    FOREIGN KEY (`id_customers_status`)
+    REFERENCES `customers_status` (`id_customers_status`)
+    ON DELETE  RESTRICT
+    ON UPDATE  CASCADE);
+
+
+
+-- -----------------------------------------------------
+-- Table `drivers`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `drivers` (
+  `id_driver` INT NOT NULL,
+  `id_person` INT NOT NULL,
+  `NIF` BIGINT NOT NULL,
+  `drivers_license` INT NOT NULL,
+  `type_of_vehicle` VARCHAR(45) NULL DEFAULT NULL,
+  `id_location` INT NOT NULL ,
+  `id_status` INT NOT NULL,
+  PRIMARY KEY (`id_driver`),
+  INDEX `fk_drivers_people1_idx` (`id_person`,`id_location` ASC) VISIBLE,
+  CONSTRAINT `fk_drivers_people1`
+    FOREIGN KEY (`id_person`)
+    REFERENCES `people` (`id_person`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_drivers_location1`
+    FOREIGN KEY (`id_location`)
+    REFERENCES `location` (`id_location`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_driver_status1`
+    FOREIGN KEY (`id_status`)
+    REFERENCES `driver_status` (`id_status`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+);
+
+
+
+
+-- -----------------------------------------------------
+-- Table `package`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `package` (
+  `id_package` INT NOT NULL,
+  `package_type` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`id_package`)
+
+)
+;
+
+
+-- -----------------------------------------------------
+-- Table `orders`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `orders` (
+  `id_orders` INT NOT NULL,
+  `id_driver` INT NOT NULL,
+  `id_customer` INT NOT NULL,
+  `id_location_pickup` INT NOT NULL,
+  `id_location_delivery` INT NULL DEFAULT NULL,
+  `price_delivery` DECIMAL(10,2) NULL DEFAULT NULL,
+  `drivers_fee` DECIMAL(10,2) NULL DEFAULT NULL,
+  `distance_KM` DECIMAL(10,2) NULL DEFAULT NULL,
+  `id_package` INT NULL DEFAULT NULL,
+  `id_person_pickup` INT NOT NULL,
+  `id_person_delivery` INT NOT NULL,
+  `rating` INT NULL,
+  `instructions` VARCHAR(255) NULL,
+  PRIMARY KEY (`id_orders`),
+  INDEX `fk_orders_drivers_idx` (`instructions`,`drivers_fee`,`price_delivery` ASC) VISIBLE,
+  CONSTRAINT `fk_orders_drivers`
+    FOREIGN KEY (`id_driver`)
+    REFERENCES `drivers` (`id_driver`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_orders_customers1`
+    FOREIGN KEY (`id_customer`)
+    REFERENCES `customers` (`id_customer`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_orders_package1`
+    FOREIGN KEY (`id_package`)
+    REFERENCES `package` (`id_package`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_orders_people1`
+    FOREIGN KEY (`id_person_pickup`)
+    REFERENCES `people` (`id_person`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_orders_people2`
+    FOREIGN KEY (`id_person_delivery`)
+    REFERENCES `people` (`id_person`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_orders_location1`
+    FOREIGN KEY (`id_location_pickup`)
+    REFERENCES `location` (`id_location`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_orders_location2`
+    FOREIGN KEY (`id_location_delivery`)
+    REFERENCES `location` (`id_location`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+
+
+
+-- -----------------------------------------------------
+-- Table `order_log`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `order_log` (
+  `id_order_log` INT auto_increment,
+  `status_time` TIME NULL DEFAULT NULL,
+  `status_date` DATE NULL DEFAULT NULL,
+  `id_order` INT NOT NULL,
+  `id_order_status` INT NOT NULL,
+  `id_city` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`id_order_log`),
+  INDEX `fk_order_log_orders1_idx` (`status_date` ASC) VISIBLE,
+  CONSTRAINT `fk_order_log_orders1`
+    FOREIGN KEY (`id_order`)
+    REFERENCES `orders` (`id_orders`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_order_log_order_status1`
+    FOREIGN KEY (`id_order_status`)
+    REFERENCES `order_status` (`id_order_status`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_order_log_city1`
+    FOREIGN KEY (`id_city`)
+    REFERENCES `city` (`id_city`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE);
+
