@@ -12,8 +12,8 @@ Within seconds GLAD will perform a validation to authorize the driver to work. I
 
 ## The product that GLAD offers are:
 1. Delivers made from Natural person (physical person):
-In this case any person can use the website or app to deliver something to another location within Portugal. The person just to be registered in GLAD platform and when open it needs to input some information as:
-I.The pickup address and a responsible.
-II.The destination address and a responsible.
-III.Not mandatory but highly suggested a description for what needs to be done to make the delivery driver job easier.
+In this case any person can use the website or app to deliver something to another location within Portugal. The person just to be registered in GLAD platform and when open it needs to input some information as: 
+I. The pickup address and a responsible.
+II. The destination address and a responsible.
+III. Not mandatory but highly suggested a description for what needs to be done to make the delivery driver job easier.
 With all this information GLAD will allocate a driver and charge a fee to the customer the driver will receive a percentage of the fee and when the delivery is done  the customer can rate the driver's job in a scale range 1 to 5 where 5 is the best and 1 is the worst.
